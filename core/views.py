@@ -360,6 +360,17 @@ def alumni_restore(request, pk):
     return redirect("alumni_detail", pk=pk)
 
 
+@admin_required
+@require_POST
+def alumni_delete(request, pk):
+    """Permanently delete an entry (maintainer only). Unlike 'hide', this can't be undone."""
+    alumnus = get_object_or_404(Alumni, pk=pk)
+    name = alumnus.name
+    alumnus.delete()
+    messages.success(request, f"Permanently deleted {name}.")
+    return redirect("alumni_list")
+
+
 # --- Contributions / profile (Phase 5) --------------------------------------
 
 @login_required

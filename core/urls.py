@@ -13,6 +13,7 @@ urlpatterns = [
     path("alumni/<int:pk>/suggest-edit/", views.alumni_suggest_edit, name="alumni_suggest_edit"),
     path("alumni/<int:pk>/report/", views.alumni_report, name="alumni_report"),
     path("alumni/<int:pk>/restore/", views.alumni_restore, name="alumni_restore"),
+    path("alumni/<int:pk>/delete/", views.alumni_delete, name="alumni_delete"),
     # Admin review queue (maintainer only)
     path("review/", views.review_queue, name="review_queue"),
     path("review/edit/<int:edit_id>/<str:action>/", views.review_edit, name="review_edit"),

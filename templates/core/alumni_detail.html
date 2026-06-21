@@ -65,5 +65,15 @@
         <p style="margin-top:8px;"><button type="submit" class="btn secondary">Submit report</button></p>
       </form>
     </details>
+
+    {# Maintainer-only: permanently delete. The onsubmit confirm guards misclicks. #}
+    {% if user.is_admin %}
+      <form method="post" action="{% url 'alumni_delete' alumnus.pk %}" style="margin-top:16px; border-top:1px solid var(--line); padding-top:12px;"
+            onsubmit="return confirm('Permanently delete {{ alumnus.name|escapejs }}? This cannot be undone.');">
+        {% csrf_token %}
+        <button type="submit" class="btn" style="background:#a33;">Delete this entry</button>
+        <span class="muted" style="margin-left:8px;">Admin only · permanent</span>
+      </form>
+    {% endif %}
   </div>
 {% endblock %}
