@@ -1,0 +1,71 @@
+{% comment %}
+Base layout shared by every page. Other templates {% extends "base.html" %}
+and fill in the {% block content %}. Keeping all the markup/CSS in one place
+makes this easy to restyle later.
+{% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}UW Alumni Map{% endblock %}</title>
+  <style>
+    /* Minimal, dependency-free styling. Swap for a real CSS framework later. */
+    :root { --uw-purple: #4b2e83; --uw-gold: #b7a57a; --ink: #222; --muted: #666; --line: #e3e3e3; }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+           color: var(--ink); margin: 0; background: #fafafa; line-height: 1.5; }
+    header { background: var(--uw-purple); color: #fff; padding: 12px 20px;
+             display: flex; align-items: center; gap: 20px; }
+    header a { color: #fff; text-decoration: none; }
+    header .brand { font-weight: 700; font-size: 18px; }
+    header nav { margin-left: auto; display: flex; gap: 16px; align-items: center; }
+    main { max-width: 900px; margin: 24px auto; padding: 0 20px; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 8px;
+            padding: 16px 18px; margin-bottom: 12px; }
+    .muted { color: var(--muted); font-size: 14px; }
+    .btn { display: inline-block; background: var(--uw-purple); color: #fff;
+           padding: 8px 14px; border-radius: 6px; border: 0; text-decoration: none;
+           font-size: 14px; cursor: pointer; }
+    .btn.secondary { background: #fff; color: var(--uw-purple); border: 1px solid var(--uw-purple); }
+    input, select, textarea { font: inherit; padding: 8px; border: 1px solid var(--line);
+                              border-radius: 6px; width: 100%; }
+    label { font-size: 14px; font-weight: 600; display: block; margin-top: 10px; }
+    .messages { list-style: none; padding: 0; }
+    .messages li { padding: 10px 14px; border-radius: 6px; margin-bottom: 8px;
+                   background: #eef6ee; border: 1px solid #cfe6cf; }
+    .badge { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 999px;
+             background: #eee; color: #444; }
+    .badge.warn { background: #fff3cd; color: #8a6d00; border: 1px solid #ffe69c; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="{% url 'alumni_list' %}">UW Alumni Map</a>
+    <nav>
+      {% if user.is_authenticated %}
+        {# The review queue link only appears for maintainers (is_admin). #}
+        {% if user.is_admin %}<a href="{% url 'review_queue' %}">Review queue</a>{% endif %}
+        <a href="{% url 'profile' %}">{{ user.email }}</a>
+        {# Logout must be a POST in modern Django, so use a tiny inline form. #}
+        <form method="post" action="{% url 'logout' %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn secondary" style="padding:4px 10px;">Log out</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}">Log in</a>
+        <a href="{% url 'signup' %}">Sign up</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main>
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

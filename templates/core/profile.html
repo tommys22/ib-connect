@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Your profile — UW Alumni Map{% endblock %}
+
+{% block content %}
+  <h1>Your profile</h1>
+  <p class="muted">{{ user.email }}</p>
+
+  <div class="card">
+    <h2 style="margin-top:0; font-size:18px;">Your contributions</h2>
+    <p class="muted">Thanks for helping build the map. Every entry, confirmation, and accepted fix keeps it useful for everyone.</p>
+
+    {# Headline total, then the breakdown. #}
+    <p style="font-size:32px; font-weight:700; margin:8px 0;">{{ total_contributions }}</p>
+
+    <table style="border-collapse:collapse;">
+      <tr><td style="padding:4px 16px 4px 0;">Alumni added</td><td><strong>{{ entries_added }}</strong></td></tr>
+      <tr><td style="padding:4px 16px 4px 0;">Verifications made</td><td><strong>{{ verifications_made }}</strong></td></tr>
+      <tr><td style="padding:4px 16px 4px 0;">Accepted edits</td><td><strong>{{ accepted_edits }}</strong></td></tr>
+    </table>
+  </div>
+{% endblock %}

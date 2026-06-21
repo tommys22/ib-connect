@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Suggest an edit — {{ alumnus.name }}{% endblock %}
+
+{% block content %}
+  <p><a href="{% url 'alumni_detail' alumnus.pk %}">&larr; Back to {{ alumnus.name }}</a></p>
+  <h1>Suggest an edit</h1>
+
+  <div class="card" style="background:#f4f1fa; border-color:#d9cfee;">
+    <p class="muted" style="margin:0;">
+      Your changes won't go live immediately — they're sent to the maintainer for
+      review. Only edit the fields that need correcting. (Public info only — no
+      personal contact details.)
+    </p>
+  </div>
+
+  <form method="post" class="card">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn">Submit suggested edit</button>
+    <a href="{% url 'alumni_detail' alumnus.pk %}" class="btn secondary">Cancel</a>
+  </form>
+{% endblock %}

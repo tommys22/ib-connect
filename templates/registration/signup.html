@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Sign up — UW Alumni Map{% endblock %}
+
+{% block content %}
+  <div class="card" style="max-width:420px; margin:0 auto;">
+    <h1>Sign up</h1>
+    <p class="muted">Open to UW students. Use your <strong>@uw.edu</strong> email.</p>
+    <form method="post">
+      {% csrf_token %}
+      {# Render the form fields with their labels, help text, and errors. #}
+      {{ form.as_p }}
+      <p><button class="btn" type="submit">Create account</button></p>
+    </form>
+    <p class="muted">Already have an account? <a href="{% url 'login' %}">Log in</a>.</p>
+  </div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Add an alumnus — UW Alumni Map{% endblock %}
+
+{% block content %}
+  <p><a href="{% url 'alumni_list' %}">&larr; Back to directory</a></p>
+  <h1>Add an alumnus</h1>
+
+  {# Privacy reminder so contributors know what NOT to put here. #}
+  <div class="card" style="background:#f4f1fa; border-color:#d9cfee;">
+    <strong>Public, professional info only.</strong>
+    <p class="muted" style="margin:6px 0 0;">
+      This is the shared directory the whole cohort can see. Don't enter personal
+      contact info (personal email, phone) here — keep that in your own private
+      outreach notes.
+    </p>
+  </div>
+
+  {% if duplicates %}
+    {# Shown when the dedup check found a likely match. We did NOT save anything. #}
+    <div class="card" style="background:#fff8e6; border-color:#ffe69c;">
+      <strong>Is this the same person?</strong>
+      <p class="muted" style="margin:6px 0 10px;">
+        We found {{ duplicates|length }} existing entr{{ duplicates|pluralize:"y,ies" }} that
+        look like a match. If one of these is the same person, open it and confirm
+        it's accurate instead of adding a duplicate.
+      </p>
+      {% for dup in duplicates %}
+        <div style="padding:8px 0; border-top:1px solid #f0e3b8;">
+          <a href="{% url 'alumni_detail' dup.pk %}" target="_blank" rel="noopener">
+            <strong>{{ dup.name }}</strong></a>
+          <span class="muted">
+            — {{ dup.firm }}{% if dup.grad_year %} · Class of {{ dup.grad_year }}{% endif %}
+            {% if dup.linkedin_url %} · has LinkedIn{% endif %}
+          </span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post" class="card">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    {% if duplicates %}
+      {# Re-submitting with confirm_new=1 tells the view to skip the dedup check. #}
+      <button type="submit" name="confirm_new" value="1" class="btn">
+        No, this is a different person — add anyway
+      </button>
+      <a href="{% url 'alumni_list' %}" class="btn secondary">Cancel</a>
+    {% else %}
+      <button type="submit" class="btn">Add to directory</button>
+    {% endif %}
+  </form>
+{% endblock %}

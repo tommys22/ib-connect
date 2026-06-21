@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Review queue — UW Alumni Map{% endblock %}
+
+{% block content %}
+  <h1>Review queue</h1>
+  <p class="muted">Maintainer-only. Accept a suggested edit to apply it to the shared record, or reject it.</p>
+
+  <h2 style="font-size:18px;">Pending suggested edits</h2>
+  {% for item in edits %}
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px;">
+        <strong>
+          <a href="{% url 'alumni_detail' item.edit.alumni.pk %}">{{ item.edit.alumni.name }}</a>
+        </strong>
+        <span class="muted">suggested by {{ item.edit.user.email|default:"(unknown)" }} · {{ item.edit.created_at|date:"M j, Y" }}</span>
+      </div>
+
+      {# Show each proposed change as old -> new so you can judge it at a glance. #}
+      <table style="margin-top:10px; border-collapse:collapse; width:100%;">
+        <tr class="muted" style="text-align:left;">
+          <th style="padding:4px 8px;">Field</th>
+          <th style="padding:4px 8px;">Current</th>
+          <th style="padding:4px 8px;">Proposed</th>
+        </tr>
+        {% for c in item.changes %}
+          <tr style="border-top:1px solid var(--line);">
+            <td style="padding:4px 8px;"><strong>{{ c.label }}</strong></td>
+            <td style="padding:4px 8px; color:#a33;">{{ c.old|default:"—" }}</td>
+            <td style="padding:4px 8px; color:#176317;">{{ c.new|default:"—" }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+
+      <div style="margin-top:12px; display:flex; gap:8px;">
+        {# Each action is its own POST form. #}
+        <form method="post" action="{% url 'review_edit' item.edit.id 'accept' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn">Accept &amp; apply</button>
+        </form>
+        <form method="post" action="{% url 'review_edit' item.edit.id 'reject' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn secondary">Reject</button>
+        </form>
+      </div>
+    </div>
+  {% empty %}
+    <div class="card"><p>No pending edits. All caught up.</p></div>
+  {% endfor %}
+
+  <h2 style="font-size:18px; margin-top:28px;">Open flags</h2>
+  {% for flag in flags %}
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px;">
+        <strong>
+          <a href="{% url 'alumni_detail' flag.alumni.pk %}">{{ flag.alumni.name }}</a>
+        </strong>
+        <span class="muted">reported by {{ flag.user.email|default:"(unknown)" }} · {{ flag.created_at|date:"M j, Y" }}</span>
+      </div>
+      <p style="margin:8px 0 0;"><em>"{{ flag.reason }}"</em></p>
+
+      <div style="margin-top:12px; display:flex; gap:8px;">
+        {# "Hide" sets the entry's status to flagged so it drops out of the directory. #}
+        <form method="post" action="{% url 'review_flag' flag.id 'hide' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn">Hide entry</button>
+        </form>
+        {# "Dismiss" keeps the entry and just clears the flag. #}
+        <form method="post" action="{% url 'review_flag' flag.id 'dismiss' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn secondary">Dismiss</button>
+        </form>
+      </div>
+    </div>
+  {% empty %}
+    <div class="card"><p>No open flags.</p></div>
+  {% endfor %}
+
+  <h2 style="font-size:18px; margin-top:28px;">Hidden entries</h2>
+  {% for alumnus in hidden %}
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <span>
+          <a href="{% url 'alumni_detail' alumnus.pk %}">{{ alumnus.name }}</a>
+          <span class="muted">— {{ alumnus.firm }}</span>
+        </span>
+        {# Restore puts the entry's status back to approved so it shows again. #}
+        <form method="post" action="{% url 'alumni_restore' alumnus.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="btn">Restore to directory</button>
+        </form>
+      </div>
+    </div>
+  {% empty %}
+    <div class="card"><p>No hidden entries.</p></div>
+  {% endfor %}
+{% endblock %}

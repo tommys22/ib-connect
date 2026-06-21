@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtual environment (re-created from requirements.txt, never backed up)
+venv/
+.venv/
+
+# Local database (holds data, not code — keep it off version control)
+db.sqlite3
+
+# Secrets / environment files
+.env
+*.env
+
+# Editor / OS noise
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

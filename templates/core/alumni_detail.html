@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}{{ alumnus.name }} — UW Alumni Map{% endblock %}
+
+{% block content %}
+  <p><a href="{% url 'alumni_list' %}">&larr; Back to directory</a></p>
+
+  {# Admins can reach a hidden (flagged) entry; show a banner + restore button. #}
+  {% if alumnus.status == "flagged" and user.is_admin %}
+    <div class="card" style="background:#fdecec; border-color:#f5b5b5;">
+      <strong>This entry is hidden from the directory (flagged).</strong>
+      <form method="post" action="{% url 'alumni_restore' alumnus.pk %}" style="margin-top:8px;">
+        {% csrf_token %}
+        <button type="submit" class="btn">Restore to directory</button>
+      </form>
+    </div>
+  {% endif %}
+
+  <div class="card">
+    <h1 style="margin-top:0;">{{ alumnus.name }}</h1>
+
+    {# Public, professional info only. No personal email/phone ever appears here. #}
+    <table class="muted" style="border-collapse:collapse;">
+      {% if alumnus.title %}<tr><td><strong>Title</strong></td><td style="padding-left:16px;">{{ alumnus.title }}</td></tr>{% endif %}
+      {% if alumnus.firm %}<tr><td><strong>Firm</strong></td><td style="padding-left:16px;">{{ alumnus.firm }}</td></tr>{% endif %}
+      {% if alumnus.firm_tier %}<tr><td><strong>Firm tier</strong></td><td style="padding-left:16px;">{{ alumnus.firm_tier }}</td></tr>{% endif %}
+      {% if alumnus.group_division %}<tr><td><strong>Group / division</strong></td><td style="padding-left:16px;">{{ alumnus.group_division }}</td></tr>{% endif %}
+      {% if alumnus.major %}<tr><td><strong>Major</strong></td><td style="padding-left:16px;">{{ alumnus.major }}</td></tr>{% endif %}
+      {% if alumnus.grad_year %}<tr><td><strong>Grad year</strong></td><td style="padding-left:16px;">{{ alumnus.grad_year }}</td></tr>{% endif %}
+      {% if alumnus.office_city %}<tr><td><strong>Office city</strong></td><td style="padding-left:16px;">{{ alumnus.office_city }}</td></tr>{% endif %}
+      <tr><td><strong>Open to chat</strong></td><td style="padding-left:16px;">{{ alumnus.open_to_chat|yesno:"Yes,Not indicated" }}</td></tr>
+      {% if alumnus.linkedin_url %}<tr><td><strong>LinkedIn</strong></td><td style="padding-left:16px;"><a href="{{ alumnus.linkedin_url }}" target="_blank" rel="noopener">Profile</a></td></tr>{% endif %}
+      {% if alumnus.source %}<tr><td><strong>Source</strong></td><td style="padding-left:16px;">{{ alumnus.source }}</td></tr>{% endif %}
+    </table>
+
+    <p class="muted" style="margin-top:14px;">
+      {% if alumnus.verified_count %}✓ {{ alumnus.verified_count }} verified{% else %}Not yet verified{% endif %}
+      {% if alumnus.last_verified %} · last confirmed {{ alumnus.last_verified }}{% endif %}
+      {% if alumnus.needs_reverification %}
+        <span class="badge warn">needs re-verification</span>
+      {% endif %}
+      {% if alumnus.added_by %} · added by {{ alumnus.added_by.email }}{% endif %}
+    </p>
+
+    {# "Still accurate? Confirm" — a state change, so it's a POST form. #}
+    <form method="post" action="{% url 'alumni_verify' alumnus.pk %}" style="margin-top:10px;">
+      {% csrf_token %}
+      <button type="submit" class="btn">
+        {% if already_verified %}Re-confirm it's still accurate{% else %}Still accurate? Confirm{% endif %}
+      </button>
+      {% if already_verified %}
+        <span class="muted">You've already confirmed this — re-confirm to refresh the date.</span>
+      {% endif %}
+    </form>
+
+    <p style="margin-top:14px;">
+      <a href="{% url 'alumni_suggest_edit' alumnus.pk %}" class="btn secondary">Suggest an edit</a>
+    </p>
+
+    {# Report / flag an entry. Inline form so it's one click away. #}
+    <details style="margin-top:10px;">
+      <summary class="muted" style="cursor:pointer;">Report a problem with this entry</summary>
+      <form method="post" action="{% url 'alumni_report' alumnus.pk %}" style="margin-top:8px;">
+        {% csrf_token %}
+        {{ flag_form.reason }}
+        <p style="margin-top:8px;"><button type="submit" class="btn secondary">Submit report</button></p>
+      </form>
+    </details>
+  </div>
+{% endblock %}

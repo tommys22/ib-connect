@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Directory — UW Alumni Map{% endblock %}
+
+{% block content %}
+  <div style="display:flex; align-items:center; gap:12px;">
+    <h1 style="margin:0;">Alumni directory</h1>
+    <a href="{% url 'alumni_add' %}" class="btn" style="margin-left:auto;">+ Add an alumnus</a>
+  </div>
+
+  {# Search + sort. Both submit via GET so the URL stays shareable/bookmarkable. #}
+  <form method="get" class="card" style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+    <div style="flex:1; min-width:220px;">
+      <label for="q">Search</label>
+      <input type="text" id="q" name="q" value="{{ query }}"
+             placeholder="name, firm, major, title, city…">
+    </div>
+    <div style="min-width:180px;">
+      <label for="sort">Sort by</label>
+      <select id="sort" name="sort">
+        {% for value, opt in sort_options.items %}
+          <option value="{{ value }}" {% if value == sort %}selected{% endif %}>{{ opt.0 }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button class="btn" type="submit">Apply</button>
+  </form>
+
+  {% for alumnus in alumni %}
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px;">
+        <h2 style="margin:0; font-size:18px;">
+          <a href="{% url 'alumni_detail' alumnus.pk %}">{{ alumnus.name }}</a>
+        </h2>
+        <span style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+          {% if alumnus.verified_count %}
+            <span class="badge">✓ {{ alumnus.verified_count }} verified</span>
+          {% endif %}
+          {% if alumnus.needs_reverification %}
+            <span class="badge warn">needs re-verification</span>
+          {% endif %}
+        </span>
+      </div>
+      <p class="muted" style="margin:6px 0 0;">
+        {{ alumnus.title }}{% if alumnus.title and alumnus.firm %} · {% endif %}{{ alumnus.firm }}
+        {% if alumnus.grad_year %} · Class of {{ alumnus.grad_year }}{% endif %}
+        {% if alumnus.office_city %} · {{ alumnus.office_city }}{% endif %}
+        {% if alumnus.last_verified %} · last confirmed {{ alumnus.last_verified }}{% endif %}
+      </p>
+    </div>
+  {% empty %}
+    <div class="card">
+      <p>No alumni match your search yet.</p>
+    </div>
+  {% endfor %}
+{% endblock %}
