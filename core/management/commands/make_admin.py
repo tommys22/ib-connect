@@ -7,10 +7,10 @@ WHAT THIS DOES
   accept/reject suggested edits and, later, resolve flags).
 
 HOW TO USE IT
-  1. Make sure you've signed up an account with your @uw.edu email first.
+  1. Make sure you've signed up an account with your school (.edu) email first.
   2. Run (from the project folder, with the venv active):
 
-         python manage.py make_admin you@uw.edu
+         python manage.py make_admin you@school.edu
 
   3. You'll see a confirmation. Now visit /review/ while logged in as that
      account.
@@ -18,7 +18,7 @@ HOW TO USE IT
 TO UNDO (demote someone)
   Add --remove:
 
-         python manage.py make_admin you@uw.edu --remove
+         python manage.py make_admin you@school.edu --remove
 
 Note: this is separate from Django's own /admin/ site (which uses superuser /
 is_staff). This flag only controls THIS app's review queue.
@@ -34,7 +34,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         # The email of the account to promote. Required.
-        parser.add_argument("email", help="The user's email, e.g. you@uw.edu")
+        parser.add_argument("email", help="The user's email, e.g. you@school.edu")
         # Optional flag to demote instead of promote.
         parser.add_argument(
             "--remove",

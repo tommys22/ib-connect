@@ -10,8 +10,9 @@ from django.contrib.auth.forms import UserCreationForm
 
 from .models import Alumni, AlumniFlag, User
 
-# Only allow students with a UW email to register.
-UW_EMAIL_DOMAIN = "uw.edu"
+# Only allow students to register: any university email (ends in ".edu").
+# This keeps signups student-only while opening it beyond a single school.
+STUDENT_EMAIL_SUFFIX = ".edu"
 
 # The public, professional fields of an alumnus. Defined once and reused by both
 # the "add" form and the "suggest edit" form so they can never drift apart.
@@ -25,15 +26,15 @@ PUBLIC_ALUMNI_FIELDS = [
 
 class SignUpForm(UserCreationForm):
     """
-    Registration form that requires a real @uw.edu email.
+    Registration form that requires a real university (.edu) email.
 
     We don't show a separate "username" box. Instead the email IS the username,
-    so students simply log in with their UW email and password.
+    so students simply log in with their school email and password.
     """
 
     email = forms.EmailField(
         required=True,
-        help_text="Use your @uw.edu email address.",
+        help_text="Use your university (.edu) email address.",
     )
 
     class Meta(UserCreationForm.Meta):
@@ -42,9 +43,9 @@ class SignUpForm(UserCreationForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"].strip().lower()
-        # Enforce the @uw.edu rule (this is an invite-only UW cohort).
-        if not email.endswith("@" + UW_EMAIL_DOMAIN):
-            raise forms.ValidationError("Please sign up with a @uw.edu email address.")
+        # Allow any university email so students at any school can join.
+        if not email.endswith(STUDENT_EMAIL_SUFFIX):
+            raise forms.ValidationError("Please sign up with a university (.edu) email address.")
         # Don't let two people register the same email.
         if User.objects.filter(username=email).exists():
             raise forms.ValidationError("An account with this email already exists.")

@@ -8,7 +8,7 @@ makes this easy to restyle later.
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}UW Alumni Map{% endblock %}</title>
+  <title>{% block title %}IB Connect{% endblock %}</title>
   <style>
     /* Minimal, dependency-free styling. Swap for a real CSS framework later. */
     :root { --uw-purple: #4b2e83; --uw-gold: #b7a57a; --ink: #222; --muted: #666; --line: #e3e3e3; }
@@ -41,7 +41,7 @@ makes this easy to restyle later.
 </head>
 <body>
   <header>
-    <a class="brand" href="{% url 'alumni_list' %}">UW Alumni Map</a>
+    <a class="brand" href="{% url 'alumni_list' %}">IB Connect</a>
     <nav>
       {% if user.is_authenticated %}
         {# The review queue link only appears for maintainers (is_admin). #}

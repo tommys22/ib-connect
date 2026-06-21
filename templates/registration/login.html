@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {# Django's LoginView renders this template by default. #}
-{% block title %}Log in — UW Alumni Map{% endblock %}
+{% block title %}Log in — IB Connect{% endblock %}
 
 {% block content %}
   <div class="card" style="max-width:420px; margin:0 auto;">
     <h1>Log in</h1>
     <form method="post">
       {% csrf_token %}
-      {# Username field actually holds the @uw.edu email (see SignUpForm). #}
-      <label for="id_username">UW email</label>
+      {# Username field actually holds the student's email (see SignUpForm). #}
+      <label for="id_username">School email</label>
       {{ form.username }}
       <label for="id_password">Password</label>
       {{ form.password }}
@@ -17,6 +17,6 @@
       {% endif %}
       <p style="margin-top:14px;"><button class="btn" type="submit">Log in</button></p>
     </form>
-    <p class="muted">No account yet? <a href="{% url 'signup' %}">Sign up with your UW email</a>.</p>
+    <p class="muted">No account yet? <a href="{% url 'signup' %}">Sign up with your school email</a>.</p>
   </div>
 {% endblock %}
