@@ -10,22 +10,51 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
+# --- Settings that differ between your laptop and the live site ---
+# These read from "environment variables" so the live server can use secure
+# values without us ever putting secrets in the code. On your laptop the
+# defaults kick in, so `python manage.py runserver` keeps working as before.
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-m$wy2d^+fn=y6o^)e1#w(5-_wde^)()&@f5tx*o10=k_du**q9'
+# SECRET_KEY signs cookies/sessions. On the live site, set DJANGO_SECRET_KEY to
+# a long random value. Locally, this insecure dev key is fine.
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "django-insecure-m$wy2d^+fn=y6o^)e1#w(5-_wde^)()&@f5tx*o10=k_du**q9",
+)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG shows detailed error pages — handy locally, dangerous in public.
+# Defaults to on for local dev; set DJANGO_DEBUG=off on the live site.
+DEBUG = os.environ.get("DJANGO_DEBUG", "on").lower() not in ("off", "0", "false")
 
-ALLOWED_HOSTS = []
+# Which web addresses are allowed to serve this site. On the live site set
+# DJANGO_ALLOWED_HOSTS to your domain, e.g. "tommystapleton.pythonanywhere.com".
+ALLOWED_HOSTS = [
+    h.strip()
+    for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+    if h.strip()
+]
+
+# For secure (https) form submissions, Django needs to trust your live domain.
+# Build https:// origins from the allowed hosts above (skipping local ones).
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{h}" for h in ALLOWED_HOSTS if h not in ("localhost", "127.0.0.1")
+]
+
+# Extra security that only switches on for the live (non-debug) site, where
+# everything is served over https. These are no-ops locally over http.
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True       # force http -> https
+    SESSION_COOKIE_SECURE = True     # only send the login cookie over https
+    CSRF_COOKIE_SECURE = True        # only send the CSRF cookie over https
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")  # trust the host's https
 
 
 # Application definition
@@ -40,7 +69,7 @@ INSTALLED_APPS = [
     'core',  # our app: users, alumni directory, outreach, crowdsourcing
 ]
 
-# Use our custom user model (adds the is_admin flag and @uw.edu signup).
+# Use our custom user model (adds the is_admin flag and .edu signup).
 # This MUST be set before the first migration, which is why we define it up front.
 AUTH_USER_MODEL = 'core.User'
 
@@ -126,6 +155,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Where `python manage.py collectstatic` gathers files for the live server to
+# serve. (PythonAnywhere points its "static files" mapping at this folder.)
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

@@ -10,6 +10,9 @@ venv/
 # Local database (holds data, not code — keep it off version control)
 db.sqlite3
 
+# Static files gathered by collectstatic for the live server (re-generated)
+staticfiles/
+
 # Secrets / environment files
 .env
 *.env
